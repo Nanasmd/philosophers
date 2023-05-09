@@ -1,73 +1,62 @@
-NAME = philo_bonus
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: nasamadi <nasamadi@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/05/05 10:25:15 by nasamadi          #+#    #+#              #
+#    Updated: 2023/05/05 10:25:16 by nasamadi         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror
-CLIBFLAGS = -lncurses
-# CFLAGS += -g3 -fsanitize=address
-ifeq ($(DEBUG),true)
-	CFLAGS += -g
-endif
+NAME		=	philo_bonus
 
-RM = rm
-RMFLAGS = -rf
+CC			=	gcc -g
+FLAGS		=	-Wall -Wextra -Werror
+RM_DIR		=	rm -rf
+RM_FILE		=	rm -f
+INCLUDES	= 	-I .
 
-INC_DIR = include
-SRC_DIR = src
-OBJ_DIR = obj
+HEADER		=	./philo_bonus.h
+SRC			=	philo_bonus.c \
+				init_philo_bonus.c \
+				utils_bonus.c
 
-HEADERS = $(wildcard $(INC_DIR)/*.h)
+OBJ_DIR		=	obj
+OBJ 		=	$(addprefix $(OBJ_DIR)/,$(SRC:.c=.o))
 
-SRCS = $(wildcard $(SRC_DIR)/*.c)
+all:	$(NAME)
 
-vpath %.c $(SRC_DIR)
+${NAME}:	${OBJ}
+			$(CC) -o $(NAME) $(OBJ) $(FLAGS)
+			@echo "\tCompiling...\t" [ $(NAME) ] $(SUCCESS)
 
-OBJS = $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.c=.o)))
+$(OBJ)		:	| $(OBJ_DIR)
 
+$(OBJ_DIR)	:
+			@mkdir -p $(OBJ_DIR)
+			
+$(OBJ_DIR)/%.o :	%.c $(HEADER) Makefile
+					${CC} $(FLAGS) $(INCLUDES) -o $@ -c $<
 
-# ============================================================================ #
-#                                   COLOR                                      #
-# ============================================================================ #
+#COLORS
+C_NO		=	"\033[00m"
+C_OK		=	"\033[32m"
+C_GOOD		=	"\033[32m"
 
-CL_BOLD	 = \e[1m
-CL_DIM	= \e[2m
-CL_UDLINE = \e[4m
+#DEBUG
+SUCCESS		=	$(C_GOOD)SUCCESS$(C_NO)
+OK			=	$(C_OK)OK$(C_NO)
+			
+clean:
+		@${RM_DIR} $(OBJ_DIR)
+		@echo "\tCleaning...\t" [ $(NAME) ] $(OK)
+				
+fclean:	clean
+		@${RM_FILE} $(NAME)
+		@echo "\tDeleting...\t" [ $(NAME) ] $(OK)
+				
+re:		fclean all
 
-NO_COLOR = \e[0m
-
-BG_TEXT = \e[48;2;45;55;72m
-BG_BLACK = \e[48;2;30;31;33m
-
-FG_WHITE = $(NO_COLOR)\e[0;37m
-FG_TEXT = $(NO_COLOR)\e[38;2;189;147;249m
-FG_TEXT_PRIMARY = $(NO_COLOR)$(CL_BOLD)\e[38;2;255;121;198m
-
-LF = \e[1K\r$(NO_COLOR)
-CRLF= \n$(LF)
-
-all : $(NAME)
-
-clean :
-	@$(RM) $(RMFLAGS) $(OBJ_DIR)
-	@printf "$(LF)🧹 $(FG_TEXT)Cleaning $(FG_TEXT_PRIMARY)$(NAME)'s Object files...\n"
-
-fclean : clean
-	@$(RM) $(RMFLAGS) $(NAME)
-	@printf "$(LF)🧹 $(FG_TEXT)Cleaning $(FG_TEXT_PRIMARY)$(NAME)\n"
-
-re : fclean all
-
-$(OBJ_DIR) :
-	@mkdir $(OBJ_DIR)
-
-$(OBJ_DIR)/%.o : %.c $(LIBFT_FILE) | $(OBJ_DIR)
-	@$(CC) $(CFLAGS) -I $(INC_DIR) -c $< -o $@
-	@printf "$(LF)🚧 $(FG_TEXT)Create $(FG_TEXT_PRIMARY)$@ $(FG_TEXT)from $(FG_TEXT_PRIMARY)$<"
-
-$(NAME) : $(LIBFT_FILE) $(HEADERS) $(OBJS)
-	@printf "$(LF)🚀 $(FG_TEXT)Successfully Created $(FG_TEXT_PRIMARY)$@'s Object files $(FG_TEXT)!"
-	@printf "$(CRLF)📚 $(FG_TEXT)Create $(FG_TEXT_PRIMARY)$@$(FG_TEXT)!\n"
-	@$(CC) $(CFLAGS) -I $(INC_DIR) $(CLIBFLAGS) $(LIBFT_FLAGS) $(OBJS) -o $@
-	@printf "$(LF)🎉 $(FG_TEXT)Successfully Created $(FG_TEXT_PRIMARY)$@ $(FG_TEXT)!\n$(NO_COLOR)"
-
-
-.PHONY: all clean fclean re bonus
+.PHONY: all bonus clean fclean re

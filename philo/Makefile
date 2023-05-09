@@ -1,73 +1,44 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: nasamadi <nasamadi@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/04/12 11:52:47 by nasamadi          #+#    #+#              #
+#    Updated: 2023/05/05 10:13:07 by nasamadi         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME = philo
 
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror
-CLIBFLAGS = -lncurses
-# CFLAGS += -g3 -fsanitize=address
-ifeq ($(DEBUG),true)
-	CFLAGS += -g
-endif
+SRCS = main.c \
+		utils.c \
+		init.c \
+		philo.c \
+		free.c \
+		check.c \
 
-RM = rm
-RMFLAGS = -rf
+CC = cc
+FLAGS = -Wall -Wextra -Werror 
+RM = rm -rf
 
-INC_DIR = include
-SRC_DIR = src
-OBJ_DIR = obj
+OBJS = ${SRCS:.c=.o}
 
-HEADERS = $(wildcard $(INC_DIR)/*.h)
+all: $(NAME)
 
-SRCS = $(wildcard $(SRC_DIR)/*.c)
+$(NAME): $(OBJS)
+	$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
-vpath %.c $(SRC_DIR)
+re: fclean all
 
-OBJS = $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.c=.o)))
+clean:
+	$(RM) $(OBJS)
 
+fclean: clean
+	$(RM) $(NAME)
 
-# ============================================================================ #
-#                                   COLOR                                      #
-# ============================================================================ #
+%.o : %.c
+	$(CC) $(FLAGS) -c $< -o $@
 
-CL_BOLD	 = \e[1m
-CL_DIM	= \e[2m
-CL_UDLINE = \e[4m
-
-NO_COLOR = \e[0m
-
-BG_TEXT = \e[48;2;45;55;72m
-BG_BLACK = \e[48;2;30;31;33m
-
-FG_WHITE = $(NO_COLOR)\e[0;37m
-FG_TEXT = $(NO_COLOR)\e[38;2;189;147;249m
-FG_TEXT_PRIMARY = $(NO_COLOR)$(CL_BOLD)\e[38;2;255;121;198m
-
-LF = \e[1K\r$(NO_COLOR)
-CRLF= \n$(LF)
-
-all : $(NAME)
-
-clean :
-	@$(RM) $(RMFLAGS) $(OBJ_DIR)
-	@printf "$(LF)🧹 $(FG_TEXT)Cleaning $(FG_TEXT_PRIMARY)$(NAME)'s Object files...\n"
-
-fclean : clean
-	@$(RM) $(RMFLAGS) $(NAME)
-	@printf "$(LF)🧹 $(FG_TEXT)Cleaning $(FG_TEXT_PRIMARY)$(NAME)\n"
-
-re : fclean all
-
-$(OBJ_DIR) :
-	@mkdir $(OBJ_DIR)
-
-$(OBJ_DIR)/%.o : %.c $(LIBFT_FILE) | $(OBJ_DIR)
-	@$(CC) $(CFLAGS) -I $(INC_DIR) -c $< -o $@
-	@printf "$(LF)🚧 $(FG_TEXT)Create $(FG_TEXT_PRIMARY)$@ $(FG_TEXT)from $(FG_TEXT_PRIMARY)$<"
-
-$(NAME) : $(LIBFT_FILE) $(HEADERS) $(OBJS)
-	@printf "$(LF)🚀 $(FG_TEXT)Successfully Created $(FG_TEXT_PRIMARY)$@'s Object files $(FG_TEXT)!"
-	@printf "$(CRLF)📚 $(FG_TEXT)Create $(FG_TEXT_PRIMARY)$@$(FG_TEXT)!\n"
-	@$(CC) $(CFLAGS) -I $(INC_DIR) $(CLIBFLAGS) $(LIBFT_FLAGS) $(OBJS) -o $@
-	@printf "$(LF)🎉 $(FG_TEXT)Successfully Created $(FG_TEXT_PRIMARY)$@ $(FG_TEXT)!\n$(NO_COLOR)"
-
-
-.PHONY: all clean fclean re bonus
+.PHONY: all clean fclean re
